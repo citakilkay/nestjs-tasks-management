@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { GetTaskFilterDto } from './dto/get-task-filter.dto';
-import { Task, TaskStatus } from './task.model';
+import { TaskStatus } from './task-status.enum';
 import { TasksService } from './tasks.service';
 
 @Controller('tasks')
@@ -19,12 +19,12 @@ export class TasksController {
     }
 
     @Get('/:id')
-    getTaskById(@Param('id') id: number) {
-        return this.tasksService.getTaskById(id);
+    async getTaskById(@Param('id') id: number): Promise<any> {
+        return await this.tasksService.getTaskById(id);
     }
 
     @Get()
-    getTasks(@Query() filterDto: GetTaskFilterDto) : Task[] {
+    getTasks(@Query() filterDto: GetTaskFilterDto) {
         if(!Object.keys(filterDto).length) {
             return this.tasksService.getAllTasks();
         }
@@ -32,8 +32,9 @@ export class TasksController {
     }
 
     @Post()
-    createTask(@Body() input: CreateTaskDto) {
-        return this.tasksService.createTask(input.title, input.description);
+    async createTask(@Body() input: CreateTaskDto): Promise<any>  {
+        const {title, description } = input;
+        return await this.tasksService.createTask(title, description);
     }
 
     @Delete('/:id')
@@ -42,7 +43,7 @@ export class TasksController {
     }
 
     @Patch('/:id/status')
-    updateTask(@Param('id') id: number, @Body('status') status: TaskStatus) : Task {
+    updateTask(@Param('id') id: number, @Body('status') status: TaskStatus) {
         return this.tasksService.updateTaskStatus(id, status);
     }
 }
